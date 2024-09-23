@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>토끼</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            overflow: hidden; 
+            background-image: url('backgroundd.png'); 
+            background-size: cover; 
+            background-position: center; 
+        }
+
+        .gif-container {
+            position: relative;
+            width: 100vw; 
+            height: 100vh; 
+        }
+
+        .moving-gif, .static-image {
+            position: absolute;
+            top: 80%; 
+            transform: translateY(-50%);
+        }
+
+        .static-image {
+            display: block; 
+        }
+
+        .moving-gif {
+            display: none;
+        }
+
+        .popup {
+            display: none; 
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            padding: 20px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup button:hover {
+            background-color: #555;
+        }
+
+        .audio-buttons {
+            position: absolute; 
+            left: 20px; 
+            top: 10%; 
+            transform: translateY(-50%); 
+            display: flex;
+            flex-direction: column; 
+            gap: 10px; 
+        }
+
+        .bottom-text {
+            position: fixed;
+            bottom: 10px; 
+            width: 100%; 
+            text-align: center; 
+            font-size: 18px; 
+            color: white; 
+            font-family: Arial, sans-serif;
+            background-color: rgba(0, 0, 0, 0.5); 
+            padding: 10px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="gif-container">
+        <img src="stoprabbit.png" alt="Static Image" class="static-image" id="staticImage">
+        <img src="rabbit.gif" alt="Moving GIF" class="moving-gif" id="gif">
+    </div>
+
+    <div class="popup" id="popup">
+        <p>달 조각을 발견했다!</p>
+        <button id="closePopup">Close</button>
+    </div>
+
+    <div class="audio-buttons">
+        <button id="bgm1But">bgm1</button>
+        <audio id="bgm1Snd" src="bgm1.mp3"></audio>
+        <button id="bgm2But">bgm2</button>
+        <audio id="bgm2Snd" src="bgm2.mp3"></audio>
+        <button id="bgm3But">bgm3</button>
+        <audio id="bgm3Snd" src="bgm3.mp3"></audio>
+    </div>
+
+    <div class="bottom-text">
+        오른쪽으로 움직여서 달 조각을 찾아보자!
+    </div>
+    
+    <script type="text/javascript">
+        function toggleAudio(audioElement) {
+            if (audioElement.paused) {
+                audioElement.play();
+            } else {
+                audioElement.pause();
+                audioElement.currentTime = 0; 
+            }
+        }
+
+        bgm1But.onclick = function() {
+            toggleAudio(document.getElementById('bgm1Snd'));
+        };
+
+        bgm2But.onclick = function() {
+            toggleAudio(document.getElementById('bgm2Snd'));
+        };
+
+        bgm3But.onclick = function() {
+            toggleAudio(document.getElementById('bgm3Snd'));
+        };
+        
+        const gif = document.getElementById('gif');
+        const staticImage = document.getElementById('staticImage');
+        const popup = document.getElementById('popup');
+        const closePopupButton = document.getElementById('closePopup');
+        const step = 5; 
+        const stopPosition = window.innerWidth - 150; 
+        let positionLeft = 0; 
+        let animationFrameId; 
+
+        gif.style.left = `${positionLeft}px`;
+        staticImage.style.left = `${positionLeft}px`;
+
+        function moveRight() {
+            if (positionLeft < stopPosition) {
+                positionLeft += step;
+                gif.style.left = `${positionLeft}px`;
+                staticImage.style.left = `${positionLeft}px`;
+                animationFrameId = requestAnimationFrame(moveRight);
+            } else {
+                cancelAnimationFrame(animationFrameId);
+                popup.style.display = 'block'; 
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight' && !animationFrameId) {
+                staticImage.style.display = 'none';
+                gif.style.display = 'block';
+                moveRight();
+            }
+        });
+
+        document.addEventListener('keyup', function(event) {
+            if (event.key === 'ArrowRight') {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null; 
+
+                if (positionLeft < stopPosition) {
+                    gif.style.display = 'none';
+                    staticImage.style.display = 'block';
+                }
+            }
+        });
+
+        closePopupButton.addEventListener('click', function() {
+            popup.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
